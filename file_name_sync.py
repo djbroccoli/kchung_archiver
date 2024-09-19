@@ -2,9 +2,11 @@ import PySimpleGUI as sg
 import os
 from pathlib import Path
 import time
+import subprocess
 
 # Define the path to your archive folder
 archive_folder_path = Path("/Users/broccoli/Desktop/archive")
+archiving_script_path = ""
 
 def main():
     sg.theme("HotDogStand")
@@ -30,7 +32,7 @@ def main():
                 try:
                     file_path = Path(file)
                     mtime = os.path.getmtime(file_path)
-                    date = time.gmtime(mtime)
+                    date = time.localtime(mtime)
                     formatted_date = time.strftime("%Y-%m-%d", date)
                     new_file_name = f"{show_name} {formatted_date}.mp3"
                     
@@ -48,11 +50,11 @@ def main():
                         if name_response == 'OK':
                             os.remove(new_file_path)
                             os.rename(file_path, new_file_path)  # Rename the new file
+                            subprocess.run(['bash', archiving_script_path], check=True)
                             sg.popup(
-                                f'{file} successfully moved to {new_file_path} and archive workflow successfully kicked off! Your show will be available on the archive in 24 hours.',
-                                font="Helvetica 20",
-                                keep_on_top=True
-                            )
+                            f'{file} successfully moved to {new_file_path} and archive workflow successfully kicked off! Your show will be available on the archive in 24 hours.',
+                            font="Helvetica 20",
+                            keep_on_top=True)
                             break  # Exit the loop after successful operation
                         elif name_response == 'Cancel':
                             # Reset the window inputs
@@ -63,6 +65,7 @@ def main():
                     else:
                         # If the file doesn't exist, just proceed with renaming
                         os.rename(file_path, new_file_path)
+                        subprocess.run(['bash', archiving_script_path], check=True)
                         sg.popup(
                             f'{file} successfully moved to {new_file_path} and archive workflow successfully kicked off! Your show will be available on the archive in 24 hours.',
                             font="Helvetica 20",
